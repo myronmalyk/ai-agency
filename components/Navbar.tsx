@@ -1,103 +1,28 @@
-'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import Link from "next/link";
 
-export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+// ---- CONFIG: tweak to your agency ----
 
-  const navItems = [
-    { name: 'Services', href: '#services' },
-    { name: 'Case Studies', href: '#case-studies' },
-    { name: 'About', href: '#about' },
-    { name: 'Process', href: '#process' },
-    { name: 'Contact', href: '#contact' }
-  ]
+const AGENCY_NAME = process.env.NEXT_PUBLIC_AGENCY_NAME || "Myron's Agency";
+const PRIMARY_CTA = process.env.NEXT_PUBLIC_PRIMARY_CTA || "/book"; // route to your booking page
 
+export default function Navbar() {
   return (
-    <motion.header 
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border"
-    >
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center space-x-2"
-          >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-lg">AI</span>
-            </div>
-            <span className="text-xl font-semibold text-gray-900">Myron&apos;s Agency</span>
-          </motion.div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="text-gray-700 hover:text-blue-600 transition-colors duration-200 relative group"
-              >
-                {item.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
-              </motion.a>
-            ))}
-          </nav>
-
-          {/* CTA Button */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hidden md:block px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:shadow-lg transition-all duration-300"
-          >
-            <a href="#contact">Get Started</a>
-          </motion.button>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-gray-700"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#0B1020]/80 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#3B82F6] font-bold">AI</div>
+          <span className="text-lg font-semibold">{AGENCY_NAME}</span>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden mt-4 pb-4"
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </a>
-            ))}
-            <button className="mt-4 w-full px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full">
-              <a href="#contact">Get Started</a>
-            </button>
-          </motion.div>
-        )}
+        <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
+          <Link href="#services" className="hover:text-white">Services</Link>
+          <Link href="#cases" className="hover:text-white">Case Studies</Link>
+          <Link href="#about" className="hover:text-white">About</Link>
+          <Link href="#process" className="hover:text-white">Process</Link>
+          <Link href="#contact" className="hover:text-white">Contact</Link>
+        </nav>
+        <Link href={PRIMARY_CTA} className="rounded-2xl bg-gradient-to-r from-[#3B82F6] via-[#7C3AED] to-[#8B5CF6] px-4 py-2 text-sm font-semibold shadow-lg shadow-indigo-900/30">Get Started</Link>
       </div>
-    </motion.header>
-  )
+    </header>
+  );
 }
