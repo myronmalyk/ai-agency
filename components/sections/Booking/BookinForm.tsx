@@ -4,21 +4,13 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 
-// Lee desde .env.local (lado cliente necesita NEXT_PUBLIC_)
-const N8N_WEBHOOK = process.env.NEXT_PUBLIC_N8N_WEBHOOK as string | undefined;
-
 /** Convierte FormData a objeto plano de strings */
 function serializeFormData(fd: FormData): Record<string, string> {
   const out: Record<string, string> = {};
   fd.forEach((value, key) => {
-    if (typeof value === "string") {
-      out[key] = value;
-    } else if (value instanceof File) {
-      // adapta si quieres subir el archivo
-      out[key] = value.name || "file";
-    } else {
-      out[key] = String(value);
-    }
+    if (typeof value === "string") out[key] = value;
+    else if (value instanceof File) out[key] = value.name || "file";
+    else out[key] = String(value);
   });
   return out;
 }
@@ -39,37 +31,31 @@ export default function BookingForm() {
     setOk(null);
     setErr(null);
 
-    const payload = serializeFormData(formData);
+    const payload = { source: "booking-page", ...serializeFormData(formData) };
 
     try {
-      if (!N8N_WEBHOOK) throw new Error("N8N webhook URL is not configured.");
-
-      // (Opcional) timeout para evitar que el fetch quede colgado
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 20000);
 
-      const res = await fetch(N8N_WEBHOOK, {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ source: "booking-page", ...payload }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
         signal: controller.signal,
+        cache: "no-store",
       });
 
       clearTimeout(timer);
 
       if (!res.ok) {
-        // intenta leer un mensaje del backend
         let detail = "";
         try { detail = (await res.text()).slice(0, 200); } catch {}
         throw new Error(`Request failed: ${res.status}${detail ? ` – ${detail}` : ""}`);
       }
 
-      setOk("Thanks! We’ll be in touch shortly.");
+      setOk("Thanks for your request! We'll get back to you soon.");
     } catch (e: unknown) {
-      setErr(errorMessage(e) || "Something went wrong. Try again or call us.");
+      setErr(errorMessage(e) || "Something went wrong. Please try again or call us.");
     } finally {
       setLoading(false);
     }
@@ -93,6 +79,7 @@ export default function BookingForm() {
           <option>Process Automation</option>
           <option>Predictive Analytics</option>
           <option>Data Strategy & Infrastructure</option>
+          <option>Other</option>
         </Select>
         <Input
           name="preferred_time"

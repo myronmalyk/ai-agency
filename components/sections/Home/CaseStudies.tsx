@@ -14,7 +14,8 @@ export default function CaseStudies(){
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 md:grid-cols-3">
         {cases.map((c)=> (
           <article key={c.title} className="rounded-3xl border border-white/10 bg-white/5 p-5">
-            <div className="aspect-[16/9] rounded-2xl border border-white/10 bg-white/5"/>
+            {/*PHOTOS*/}
+            {/*<div className="aspect-[16/9] rounded-2xl border border-white/10 bg-white/5"/>*/}
             <div className="mt-4 flex flex-wrap gap-2">
               {c.tags.map((t)=> (<span key={t} className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/80">{t}</span>))}
             </div>

@@ -1,8 +1,9 @@
 // components/ChatWidget.tsx
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const N8N_ENDPOINT = process.env.NEXT_PUBLIC_N8N_WEBHOOK || ""; // ← change to your n8n URL
+const API_ENDPOINT = "/api/agent"; // ← ahora llamamos al API Route (proxy al webhook de n8n)
 const gradient = "from-[#3B82F6] via-[#7C3AED] to-[#8B5CF6]"; // blue → violet
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -18,7 +19,7 @@ export default function ChatWidget() {
   const listRef = useRef<HTMLDivElement | null>(null);
   const sessionId = useMemo(() => getOrCreateSession(), []);
 
-  // auto-scroll to bottom when messages change
+  // auto-scroll to bottom when messages change or panel opens
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, open]);
@@ -27,21 +28,48 @@ export default function ChatWidget() {
     e?.preventDefault();
     const text = input.trim();
     if (!text || loading) return;
+
     setInput("");
     setLoading(true);
     setError(null);
 
     const userMsg: Message = { role: "user", content: text };
+    // añadimos primero el mensaje del usuario al estado
     setMessages((m) => [...m, userMsg]);
 
+    // usamos el historial actualizado para el backend (evita enviar un historial desfasado)
+    const historyToSend = [...messages, userMsg];
+
     try {
-      const res = await fetch(N8N_ENDPOINT, {
+      const res = await fetch(API_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, message: text, history: messages }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ sessionId, message: text, history: historyToSend }),
+        cache: "no-store",
       });
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-      const data: unknown = await res.json();
+
+      // leemos la respuesta (texto o json)
+      const ct = res.headers.get("content-type") || "";
+      const data = ct.includes("application/json") ? await res.json() : await res.text();
+
+      if (!res.ok) {
+        // si el proxy retornó detalles, muéstralos
+        const detail =
+          typeof data === "string"
+            ? data.slice(0, 300)
+            : typeof data === "object" && data !== null
+            ? JSON.stringify(data).slice(0, 300)
+            : "";
+        const msg = `Upstream error ${res.status}${detail ? ` — ${detail}` : ""}`;
+        setError(msg);
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: "Sorry, I couldn’t reach the agent. Please try again." },
+        ]);
+        return;
+      }
+
+      // normalizamos la respuesta
       let reply = "(No reply)";
       if (typeof data === "string") {
         reply = data;
@@ -50,8 +78,10 @@ export default function ChatWidget() {
         reply =
           (typeof maybe.reply === "string" && maybe.reply) ||
           (typeof maybe.result === "string" && maybe.result) ||
+          (typeof maybe.text === "string" && maybe.text) ||
           "(No reply)";
       }
+
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Network error";
@@ -162,8 +192,8 @@ function Bubble({ role, content }: { role: "user" | "assistant"; content: string
       <div
         className={`max-w-[80%] whitespace-pre-wrap rounded-2xl border p-3 text-sm shadow-sm ${
           isUser
-            ? `border-white/10 bg-gradient-to-r ${gradient}`
-            : "border-white/10 bg-white/5"
+            ? `border-white/10 bg-gradient-to-r ${gradient} text-white`
+            : "border-white/10 bg-white/5 text-white"
         }`}
       >
         {content}
@@ -177,8 +207,7 @@ function Typing() {
     <div className="mb-3 flex justify-start">
       <div className="flex max-w-[80%] items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-white/70">
         <span className="inline-flex gap-1">
-          <Dot /> <Dot style={{ animationDelay: "120ms" }} />{" "}
-          <Dot style={{ animationDelay: "240ms" }} />
+          <Dot /> <Dot style={{ animationDelay: "120ms" }} /> <Dot style={{ animationDelay: "240ms" }} />
         </span>
         Typing…
       </div>
@@ -187,12 +216,7 @@ function Typing() {
 }
 
 function Dot(props: React.HTMLAttributes<HTMLSpanElement>) {
-  return (
-    <span
-      className="inline-block h-2 w-2 animate-pulse rounded-full bg-white/60"
-      {...props}
-    />
-  );
+  return <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white/60" {...props} />;
 }
 
 function getOrCreateSession() {

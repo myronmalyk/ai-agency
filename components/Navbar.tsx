@@ -15,6 +15,7 @@ export default function Navbar() {
           <span className="text-lg font-semibold">{AGENCY_NAME}</span>
         </div>
         <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
+          <Link href="/" className="hover:text-white">Home</Link>
           <Link href="#services" className="hover:text-white">Services</Link>
           <Link href="#cases" className="hover:text-white">Case Studies</Link>
           <Link href="#about" className="hover:text-white">About</Link>
