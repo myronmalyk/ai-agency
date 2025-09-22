@@ -9,10 +9,10 @@ const PRIMARY_CTA = process.env.NEXT_PUBLIC_PRIMARY_CTA || ""; // route to your 
 
 export default function Services(){
   const cards = [
-    {icon:"🤖", title:"AI Chatbots & Virtual Assistants", bullets:["24/7 Customer Support","Multi‑language Support","CRM Integration","Advanced NLP"], color:"from-[#2A6AF7] to-[#7C3AED]"},
-    {icon:"📈", title:"Predictive Analytics & Forecasting", bullets:["Market Trend Analysis","Customer Behavior","Risk Assessment","Revenue Forecasting"], color:"from-[#7C3AED] to-[#8B5CF6]"},
-    {icon:"⚙️", title:"Process Automation & Optimization", bullets:["Workflow Automation","Document Processing","Quality Control","Performance Monitoring"], color:"from-[#3B82F6] to-[#60A5FA]"},
-    {icon:"🗄️", title:"Data Strategy & Infrastructure", bullets:["Data Architecture","ETL Pipelines","Data Governance","Cloud Migration"], color:"from-[#8B5CF6] to-[#3B82F6]"},
+    {icon:"📝", title:"Generative AI & Content Creation", desc:"We help you create and scale content with AI—faster and smarter.", bullets:["Social media posts","Blog articles & newsletters","Images & video generation","SEO optimization"], color:"from-[#2A6AF7] to-[#7C3AED]"},
+    {icon:"🎯", title:"AI Personalization & Customer Experience", desc:"We use AI to personalize every interaction with your customers.", bullets:["Dynamic websites","Personalized emails","Smart recommendations","Customer segmentation"], color:"from-[#7C3AED] to-[#8B5CF6]"},
+    {icon:"💼", title:"AI for Sales & Revenue Growth", desc:"We bring AI into your sales process to help you close more deals.", bullets:["Lead scoring & prioritization","Sales forecasting","AI chatbots for sales","CRM integration"], color:"from-[#3B82F6] to-[#60A5FA]"},
+    {icon:"✅", title:"AI Audit & Governance", desc:"We make sure your AI is safe, fair, and compliant.", bullets:["Bias & fairness checks","Data privacy compliance","Responsible AI policies","Ongoing monitoring"], color:"from-[#8B5CF6] to-[#3B82F6]"},
   ];
   return (
     <section id="services" className="mt-14">
@@ -21,7 +21,7 @@ export default function Services(){
         {cards.map((c) => (
           <article key={c.title} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <div className={`inline-flex items-center gap-3 rounded-2xl bg-gradient-to-br ${c.color} px-3 py-2 text-lg font-semibold`}>{c.icon}<span>{c.title}</span></div>
-            <p className="mt-3 text-white/70">We build, integrate and scale—tailored to your stack and goals.</p>
+            <p className="mt-3 text-white/70">{c.desc}</p>
             <ul className="mt-4 space-y-2 text-white/80">
               {c.bullets.map((b)=> (<li key={b} className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-white/60"/> {b}</li>))}
             </ul>
