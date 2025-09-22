@@ -39,7 +39,7 @@ export default function Hero() {
             ))}
           </div>
         </div>
-        <div className="relative mx-auto w-full max-w-lg">
+        <div className="relative mx-auto w-full max-w-lg hidden sm:block">
           <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-white/5">
             {/* Replace with your hero image */}
             <div className="grid h-full w-full place-items-center text-white/60"><Image className="rounded-3xl" src="/img/hero.png" alt="Hero Image" layout="fill" objectFit="cover" /></div>
