@@ -5,7 +5,6 @@ import { Metadata } from "next";
 const inter = Inter({ subsets: ["latin"] });
 
 import Hero from "@/components/sections/Home/Hero";
-import StatsBar from "@/components/sections/Home/StatsBar";
 import TrustedStrip from "@/components/sections/Home/TrustedStrip";
 import Services from "@/components/sections/Home/Services";
 import CaseStudies from "@/components/sections/Home/CaseStudies";
@@ -23,7 +22,6 @@ export default function HomePage() {
   return (
     <main className={`${inter.className} min-h-screen bg-[#0B1020] text-white`}> 
       <Hero />
-      <StatsBar />
       <TrustedStrip />
       <Services />
       <CaseStudies />
